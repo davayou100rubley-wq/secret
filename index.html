@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>SECRET MESSENGER v6.0</title>
+<title>SECRET MESSENGER v8.0</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -28,21 +28,31 @@ input:focus,textarea:focus{border-color:var(--g);box-shadow:0 0 8px var(--ggl);b
 input::placeholder{color:var(--gdd);opacity:.8;}
 button{cursor:pointer;padding:8px 18px;text-transform:uppercase;letter-spacing:1px;font-size:12px;background:rgba(0,255,65,.05);border:1px solid var(--gd);}
 button:hover{background:var(--g);color:var(--bg);text-shadow:none;box-shadow:0 0 12px var(--ggl);}
-button:active{transform:scale(.96);}button:disabled{opacity:.4;cursor:not-allowed;}
-.scr{display:none;position:absolute;top:0;left:0;width:100%;height:100%;}.scr.on{display:flex;}
-#scr-reg{flex-direction:column;align-items:center;justify-content:center;padding:20px;background:var(--bg);}
+button:active{transform:scale(.96);}
+button:disabled{opacity:.4;cursor:not-allowed;}
+.scr{display:none;position:absolute;top:0;left:0;width:100%;height:100%;}
+.scr.on{display:flex;}
+#scr-auth{flex-direction:column;align-items:center;justify-content:center;padding:20px;background:var(--bg);}
 .reg-c{width:100%;max-width:480px;animation:fadeInScale .5s forwards;}
 .reg-b{border:1px solid var(--gd);padding:30px 25px;background:var(--bgw);position:relative;}
 .reg-b::before{content:'';position:absolute;top:-1px;left:-1px;right:-1px;bottom:-1px;border:1px solid rgba(0,255,65,.1);pointer-events:none;}
 .reg-h{text-align:center;margin-bottom:8px;}
 .reg-h h1{font-size:22px;letter-spacing:6px;color:var(--g);text-shadow:0 0 10px var(--g),0 0 20px var(--ggl);}
 .reg-sub{text-align:center;font-size:10px;color:var(--gd);letter-spacing:2px;margin-bottom:15px;}
+.auth-tabs{display:flex;gap:5px;margin-bottom:20px;}
+.auth-tab{flex:1;padding:10px;text-align:center;font-size:11px;letter-spacing:1px;cursor:pointer;border:1px solid var(--gdd);background:rgba(0,255,65,.03);color:var(--gd);transition:.2s;text-transform:uppercase;}
+.auth-tab:hover{border-color:var(--gm);color:var(--gm);}
+.auth-tab.active{border-color:var(--g);background:rgba(0,255,65,.1);color:var(--g);text-shadow:0 0 5px var(--ggl);}
+.auth-form{display:none;}
+.auth-form.on{display:block;}
 .reg-f{margin-bottom:18px;}
 .reg-f label{display:block;font-size:11px;color:var(--gd);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;}
 .reg-f input{width:100%;padding:10px 12px;font-size:16px;letter-spacing:1px;}
-.p-hint{font-size:10px;color:var(--gdd);margin-top:6px;line-height:1.7;}.p-hint span{display:block;}
+.p-hint{font-size:10px;color:var(--gdd);margin-top:6px;line-height:1.7;}
+.p-hint span{display:block;}
 .p-stat{font-size:11px;margin-top:6px;min-height:18px;letter-spacing:1px;}
-.p-stat.ok{color:var(--g);}.p-stat.bad{color:var(--red);}
+.p-stat.ok{color:var(--g);}
+.p-stat.bad{color:var(--red);}
 .r-err{display:none;color:var(--red);font-size:12px;margin-top:12px;padding:10px;border:1px solid var(--red);background:rgba(255,0,0,.05);animation:fadeIn .3s;}
 .r-ok{display:none;color:var(--g);font-size:12px;margin-top:12px;padding:10px;border:1px solid var(--g);background:rgba(0,255,65,.05);animation:fadeIn .3s;}
 .r-warn{display:none;color:var(--yel);font-size:11px;margin-top:12px;padding:8px;border:1px solid var(--yel);background:rgba(255,170,0,.05);}
@@ -64,7 +74,8 @@ button:active{transform:scale(.96);}button:disabled{opacity:.4;cursor:not-allowe
 .cm-h{padding:6px 12px;font-size:10px;color:var(--gd);letter-spacing:1px;border-bottom:1px solid var(--gdd);text-transform:uppercase;}
 .cm-i{padding:8px 12px;font-size:12px;color:var(--gm);cursor:pointer;display:flex;align-items:center;gap:8px;transition:.15s;letter-spacing:1px;}
 .cm-i:hover{background:rgba(0,255,65,.1);color:var(--g);}
-.cm-i.dng{color:var(--red);}.cm-i.dng:hover{background:rgba(255,0,0,.1);}
+.cm-i.dng{color:var(--red);}
+.cm-i.dng:hover{background:rgba(255,0,0,.1);}
 .cm-d{height:1px;background:var(--gdd);margin:3px 0;}
 .wpm{display:none;position:fixed;z-index:10000;background:var(--bgw);border:1px solid var(--g);box-shadow:0 0 15px rgba(0,255,65,.2),0 4px 20px rgba(0,0,0,.8);animation:ctxIn .15s;padding:10px;width:240px;}
 .wpm.on{display:block;}
@@ -80,13 +91,15 @@ button:active{transform:scale(.96);}button:disabled{opacity:.4;cursor:not-allowe
 .toast .tt{font-size:9px;color:var(--gd);margin-bottom:3px;text-transform:uppercase;}
 .toast.fo{opacity:0;transition:opacity .5s;}
 .fpo,.po{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:5000;align-items:center;justify-content:center;padding:20px;}
-.fpo.on,.po.on{display:flex;}.fpo{z-index:6000;}
+.fpo.on,.po.on{display:flex;}
+.fpo{z-index:6000;}
 .fpb,.pb{border:1px solid var(--g);padding:25px;background:var(--bgw);max-width:400px;width:100%;animation:fadeInScale .3s;box-shadow:0 0 30px rgba(0,255,65,.1);}
 .pb{text-align:center;max-width:380px;}
 .fpb h3,.pb h3{font-size:13px;margin-bottom:8px;letter-spacing:2px;text-transform:uppercase;text-align:center;}
 .fp-sub,.p-sub{font-size:10px;color:var(--gd);margin-bottom:15px;text-align:center;}
 .fp-st{font-size:11px;margin-bottom:12px;padding:8px;border:1px solid var(--gdd);text-align:center;}
-.fp-st.hp{color:var(--g);border-color:var(--gd);}.fp-st.np{color:var(--gdd);}
+.fp-st.hp{color:var(--g);border-color:var(--gd);}
+.fp-st.np{color:var(--gdd);}
 .fpb input,.pb input{width:100%;padding:10px 12px;font-size:14px;margin-bottom:8px;letter-spacing:2px;}
 .pb input{text-align:center;font-size:18px;letter-spacing:4px;margin-bottom:12px;}
 .fp-hi{font-size:9px;color:var(--gdd);margin-bottom:12px;line-height:1.5;}
@@ -116,21 +129,26 @@ button:active{transform:scale(.96);}button:disabled{opacity:.4;cursor:not-allowe
 .wc:hover{background:var(--g);}
 .wc:hover svg line{stroke:var(--bg);}
 .wb{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;}
-.wb::-webkit-scrollbar{width:5px;}.wb::-webkit-scrollbar-thumb{background:var(--gdd);}
+.wb::-webkit-scrollbar{width:5px;}
+.wb::-webkit-scrollbar-thumb{background:var(--gdd);}
 .cmc{border:1px solid var(--gdd);padding:12px;margin-bottom:15px;text-align:center;background:var(--gg);}
 .cmc .cl{font-size:10px;color:var(--gd);letter-spacing:2px;text-transform:uppercase;}
 .cmc .cv{font-size:24px;letter-spacing:6px;color:var(--g);margin-top:6px;text-shadow:0 0 10px var(--g);}
 .csr{display:flex;gap:10px;margin-bottom:15px;}
-.csr input{flex:1;padding:9px 12px;}.csr button{padding:9px 16px;white-space:nowrap;}
+.csr input{flex:1;padding:9px 12px;}
+.csr button{padding:9px 16px;white-space:nowrap;}
 .cc{flex:1;min-height:100px;background:rgba(0,255,65,.02);border:1px solid var(--gdd);padding:12px;font-size:12px;overflow-y:auto;line-height:1.9;}
 .cc .cl2{margin-bottom:3px;word-break:break-all;}
-.cc .cp{color:var(--gd);}.cc .cr{color:var(--g);font-weight:bold;}.cc .ce{color:var(--red);}
+.cc .cp{color:var(--gd);}
+.cc .cr{color:var(--g);font-weight:bold;}
+.cc .ce{color:var(--red);}
 .tcb{margin-top:15px;border:1px solid var(--gdd);padding:12px;background:rgba(0,255,65,.02);}
 .tcb h4{font-size:10px;color:var(--gd);margin-bottom:10px;letter-spacing:2px;text-transform:uppercase;}
 .tcr{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:5px 0;border-bottom:1px solid rgba(0,255,65,.06);gap:8px;}
 .tcr:last-child{border-bottom:none;}
 .tcr .tn{color:var(--gm);}
-.tcr .tc2{color:var(--g);cursor:pointer;text-decoration:underline;letter-spacing:2px;}.tcr .tc2:hover{color:#fff;}
+.tcr .tc2{color:var(--g);cursor:pointer;text-decoration:underline;letter-spacing:2px;}
+.tcr .tc2:hover{color:#fff;}
 .od{width:7px;height:7px;min-width:7px;border-radius:50%;background:var(--gddd);}
 .od.on{background:var(--g);box-shadow:0 0 5px var(--g);animation:onlinePulse 2s infinite;}
 .css{margin-bottom:15px;}
@@ -139,7 +157,8 @@ button:active{transform:scale(.96);}button:disabled{opacity:.4;cursor:not-allowe
 .csrr input{flex:1;padding:9px 12px;text-transform:uppercase;letter-spacing:3px;text-align:center;font-size:16px;}
 .csrr button{padding:9px 16px;white-space:nowrap;}
 .ce2{display:none;color:var(--red);font-size:11px;margin-top:10px;padding:8px;border:1px solid var(--red);}
-.chc{display:none;flex-direction:column;flex:1;height:100%;}.chc.on{display:flex;}
+.chc{display:none;flex-direction:column;flex:1;height:100%;}
+.chc.on{display:flex;}
 .chh{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--gd);margin-bottom:10px;flex-shrink:0;}
 .chb{width:28px;height:28px;min-width:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid var(--gdd);background:none;padding:0;}
 .chb:hover{background:rgba(0,255,65,.1);border-color:var(--g);}
@@ -147,13 +166,25 @@ button:active{transform:scale(.96);}button:disabled{opacity:.4;cursor:not-allowe
 .chst{font-size:9px;color:var(--gdd);letter-spacing:1px;}
 .chst.son{color:var(--g);text-shadow:0 0 5px var(--ggl);}
 .chma{flex:1;display:flex;flex-direction:column;gap:8px;overflow-y:auto;padding:8px 0;margin-bottom:12px;min-height:80px;}
-.chmf{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--gdd);cursor:pointer;transition:.2s;max-width:82%;animation:slideUp .3s;}
-.chmf:hover{background:var(--gg);border-color:var(--gm);}
-.chmf.ms{align-self:flex-end;border-color:var(--gd);background:rgba(0,255,65,.04);}
-.chmf.mr{align-self:flex-start;}
-.chmf .mn{font-size:11px;letter-spacing:1px;color:var(--g);}
-.chmf .md{font-size:9px;color:var(--gdd);margin-top:3px;}
-.chmf .mdir{font-size:9px;color:var(--gd);margin-top:2px;text-transform:uppercase;letter-spacing:1px;}
+.chma::-webkit-scrollbar{width:4px;}
+.chma::-webkit-scrollbar-thumb{background:var(--gdd);}
+
+/* СООБЩЕНИЯ: текстовые пузыри */
+.chmf{display:flex;flex-direction:column;gap:3px;padding:8px 12px;border:1px solid var(--gdd);max-width:78%;animation:slideUp .3s;}
+.chmf.ms{align-self:flex-end;border-color:var(--gd);background:rgba(0,255,65,.08);border-radius:8px 8px 2px 8px;}
+.chmf.mr{align-self:flex-start;background:rgba(0,255,65,.03);border-radius:8px 8px 8px 2px;}
+.msg-text{font-size:13px;color:var(--g);white-space:pre-wrap;word-break:break-word;line-height:1.4;}
+.chmf.ms .msg-text{color:#ccffcc;}
+.msg-meta{font-size:9px;color:var(--gdd);text-align:right;}
+.chmf.mr .msg-meta{text-align:left;}
+
+/* СООБЩЕНИЯ: файлы (кликабельные) */
+.chmf-file{flex-direction:row;align-items:center;gap:10px;cursor:pointer;transition:.2s;}
+.chmf-file:hover{background:var(--gg);border-color:var(--gm);}
+.chmf-file .mn{font-size:11px;letter-spacing:1px;color:var(--g);}
+.chmf-file .md{font-size:9px;color:var(--gdd);margin-top:3px;}
+.chmf-file .mdir{font-size:9px;color:var(--gd);margin-top:2px;text-transform:uppercase;letter-spacing:1px;}
+
 .chme{text-align:center;color:var(--gdd);font-size:11px;padding:25px;letter-spacing:1px;}
 .chib{display:flex;gap:8px;align-items:center;flex-shrink:0;}
 .chib .ab{width:38px;height:38px;min-width:38px;display:flex;align-items:center;justify-content:center;border:1px solid var(--gdd);cursor:pointer;background:none;padding:0;}
@@ -175,11 +206,13 @@ button:active{transform:scale(.96);}button:disabled{opacity:.4;cursor:not-allowe
 .flr:hover .fn{color:var(--g);}
 .flr .fdt{color:var(--gdd);font-size:10px;white-space:nowrap;}
 .flr .fdr{font-size:12px;width:22px;text-align:center;font-weight:bold;}
-.flr .fdr.ds{color:var(--g);}.flr .fdr.dr{color:var(--gd);}
+.flr .fdr.ds{color:var(--g);}
+.flr .fdr.dr{color:var(--gd);}
 .fem{text-align:center;color:var(--gdd);font-size:12px;padding:35px;letter-spacing:2px;}
 .aic{display:flex;flex-direction:column;height:100%;}
 .aim{flex:1;overflow-y:auto;padding:10px 0;display:flex;flex-direction:column;gap:10px;}
-.aim::-webkit-scrollbar{width:4px;}.aim::-webkit-scrollbar-thumb{background:var(--gdd);}
+.aim::-webkit-scrollbar{width:4px;}
+.aim::-webkit-scrollbar-thumb{background:var(--gdd);}
 .ai-msg{padding:10px 14px;border:1px solid var(--gdd);font-size:12px;line-height:1.7;max-width:90%;animation:slideUp .3s;}
 .ai-msg.u{align-self:flex-end;border-color:var(--gd);background:rgba(0,255,65,.05);}
 .ai-msg.b{align-self:flex-start;background:rgba(0,255,65,.02);}
@@ -204,26 +237,81 @@ button:active{transform:scale(.96);}button:disabled{opacity:.4;cursor:not-allowe
 .tb{height:44px;min-height:44px;}
 .reg-b{padding:20px 15px;}
 .csr,.csrr{flex-direction:column;}
-.chib{flex-wrap:wrap;}.chib .mi{order:1;flex-basis:100%;}.chib .ab{order:2;}.chib .sb{order:3;flex:1;}
+.chib{flex-wrap:wrap;}
+.chib .mi{order:1;flex-basis:100%;}
+.chib .ab{order:2;}
+.chib .sb{order:3;flex:1;}
 .tb-u,.tb-n{display:none;}
-.fi{width:85px;}.fi .fl{font-size:9px;}
-.aiir{flex-wrap:wrap;}.aiir input{flex-basis:100%;order:1;}.aiir button{order:2;flex:1;}
+.fi{width:85px;}
+.fi .fl{font-size:9px;}
+.aiir{flex-wrap:wrap;}
+.aiir input{flex-basis:100%;order:1;}
+.aiir button{order:2;flex:1;}
 }
 </style>
 </head>
 <body>
 
-<div class="scr on" id="scr-reg"><div class="reg-c"><div class="reg-b">
-<div class="reg-h"><h1 class="glow-s">[ SECRET ]</h1></div>
-<div class="reg-sub">МУЛЬТИПЛЕЕР // SUPABASE REALTIME // v6.0</div>
-<hr class="sep-t">
-<div class="reg-f"><label>&gt; НОМЕР ТЕЛЕФОНА:</label><input type="tel" id="r-phone" placeholder="+79991234567" maxlength="16" autocomplete="off"></div>
-<div class="reg-f"><label>&gt; ПАРОЛЬ [ЦИФРЫ, МИН. 5]:</label><input type="password" id="r-pass" placeholder="•••••" maxlength="20" autocomplete="off" inputmode="numeric"><div class="p-stat" id="p-stat"></div><div class="p-hint"><span>&gt; [✓] ТОЛЬКО ЦИФРЫ, МИН. 5</span><span>&gt; [✗] НЕ 12345, НЕ 00000</span></div></div>
-<div class="r-warn" id="r-warn"></div><div class="r-err" id="r-err"></div><div class="r-ok" id="r-ok"></div>
-<button type="button" class="r-btn" id="r-btn">[ ЗАРЕГИСТРИРОВАТЬСЯ ]</button>
-<div class="r-note">★ МУЛЬТИПЛЕЕР НА SUPABASE ★<br>1. ЗАРЕГИСТРИРУЙТЕСЬ → СКОПИРУЙТЕ СВОЙ КОД<br>2. ОТПРАВЬТЕ ССЫЛКУ НА САЙТ + СВОЙ КОД ДРУГУ<br>3. ДРУГ РЕГИСТРИРУЕТСЯ → ВИДИТ ВАС В СПИСКЕ ОНЛАЙН<br>4. КЛИКАЕТЕ НА КОДЫ ДРУГ ДРУГА → ПЕРЕПИСКА В РЕАЛЬНОМ ВРЕМЕНИ<br><br>РАБОТАЕТ С ЛЮБЫХ УСТРОЙСТВ ЧЕРЕЗ ИНТЕРНЕТ.</div>
-</div></div></div>
+<!-- ЭКРАН АВТОРИЗАЦИИ -->
+<div class="scr on" id="scr-auth">
+    <div class="reg-c">
+        <div class="reg-b">
+            <div class="reg-h"><h1 class="glow-s">[ SECRET ]</h1></div>
+            <div class="reg-sub">МУЛЬТИПЛЕЕР // АККАУНТЫ // v8.0</div>
+            <hr class="sep-t">
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tab-reg">РЕГИСТРАЦИЯ</div>
+                <div class="auth-tab" id="tab-login">ВХОД</div>
+            </div>
+            <div class="auth-form on" id="form-reg">
+                <div class="reg-f">
+                    <label>&gt; НОМЕР ТЕЛЕФОНА:</label>
+                    <input type="tel" id="reg-phone" placeholder="+79991234567" maxlength="16" autocomplete="off">
+                </div>
+                <div class="reg-f">
+                    <label>&gt; ПАРОЛЬ [ЦИФРЫ, МИН. 5]:</label>
+                    <input type="password" id="reg-pass" placeholder="•••••" maxlength="20" autocomplete="off" inputmode="numeric">
+                    <div class="p-stat" id="reg-pass-stat"></div>
+                    <div class="p-hint">
+                        <span>&gt; [✓] ТОЛЬКО ЦИФРЫ, МИН. 5 СИМВОЛОВ</span>
+                        <span>&gt; [✗] НЕ 12345, НЕ 00000, НЕ ОДНА ЦИФРА</span>
+                    </div>
+                </div>
+                <div class="reg-f">
+                    <label>&gt; ПОВТОРИТЕ ПАРОЛЬ:</label>
+                    <input type="password" id="reg-pass2" placeholder="•••••" maxlength="20" autocomplete="off" inputmode="numeric">
+                </div>
+                <div class="r-warn" id="reg-warn"></div>
+                <div class="r-err" id="reg-err"></div>
+                <div class="r-ok" id="reg-ok"></div>
+                <button type="button" class="r-btn" id="reg-btn">[ СОЗДАТЬ АККАУНТ ]</button>
+            </div>
+            <div class="auth-form" id="form-login">
+                <div class="reg-f">
+                    <label>&gt; ТЕЛЕФОН ИЛИ КОД:</label>
+                    <input type="text" id="login-id" placeholder="+7999... или XXXXXX" autocomplete="off">
+                    <div class="p-hint">
+                        <span>&gt; ВВЕДИТЕ ТЕЛЕФОН ИЛИ КОД АГЕНТА (6 СИМВОЛОВ)</span>
+                    </div>
+                </div>
+                <div class="reg-f">
+                    <label>&gt; ПАРОЛЬ:</label>
+                    <input type="password" id="login-pass" placeholder="•••••" autocomplete="off" inputmode="numeric">
+                </div>
+                <div class="r-err" id="login-err"></div>
+                <div class="r-ok" id="login-ok"></div>
+                <button type="button" class="r-btn" id="login-btn">[ ВОЙТИ В АККАУНТ ]</button>
+            </div>
+            <div class="r-note">
+                ★ АККАУНТЫ ХРАНЯТСЯ В SUPABASE ★<br>
+                ЗАРЕГИСТРИРУЙТЕСЬ ОДИН РАЗ → ЗАХОДИТЕ ВСЕГДА В СВОЙ АККАУНТ.<br>
+                МОЖНО ВОЙТИ С ЛЮБОГО УСТРОЙСТВА ПО ТЕЛЕФОНУ + ПАРОЛЮ.
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- РАБОЧИЙ СТОЛ -->
 <div class="scr" id="scr-desk">
 <div class="dsk" id="dsk-area">
 <div class="dsk-wm">SECRET</div>
@@ -268,14 +356,14 @@ button:active{transform:scale(.96);}button:disabled{opacity:.4;cursor:not-allowe
 <div class="chh"><button class="chb" id="chat-back"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M8 1 L3 6 L8 11" stroke="#00ff41" stroke-width="1.5" fill="none"/></svg></button><span>КАНАЛ: <span class="chcode" id="chat-pcode"></span></span><span class="chst" id="chat-st">[ОФЛАЙН]</span></div>
 <hr class="sep">
 <div class="chma" id="chat-msgs"></div>
-<div class="chib"><button class="ab" id="chat-att"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M14 7 L8 13 Q5 16 3 14 Q1 12 4 9 L10 3 Q12 1 13 2 Q14 3 12 5 L6 11" stroke="#00ff41" stroke-width="1.2" fill="none"/></svg></button><input type="file" class="fih" id="chat-file"><input type="text" class="mi" id="chat-in" placeholder="СООБЩЕНИЕ..." autocomplete="off"><button type="button" class="sb" id="chat-send">ОТПРАВИТЬ</button></div>
+<div class="chib"><button class="ab" id="chat-att" title="Фото/файл до 2 МБ"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M14 7 L8 13 Q5 16 3 14 Q1 12 4 9 L10 3 Q12 1 13 2 Q14 3 12 5 L6 11" stroke="#00ff41" stroke-width="1.2" fill="none"/></svg></button><input type="file" class="fih" id="chat-file" accept="image/*,*/*"><input type="text" class="mi" id="chat-in" placeholder="СООБЩЕНИЕ..." autocomplete="off"><button type="button" class="sb" id="chat-send">ОТПРАВИТЬ</button></div>
 </div>
 <div class="fvo" id="chat-vwr"><div class="fvh"><span class="fvn glow" id="cv-name"></span><button class="wc" id="cv-x"><svg width="12" height="12" viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11" stroke="#00ff41" stroke-width="1.5"/><line x1="11" y1="1" x2="1" y2="11" stroke="#00ff41" stroke-width="1.5"/></svg></button></div><div class="fvb" id="cv-body"></div></div>
 </div></div></div>
 
-<div class="wo" id="w-files"><div class="wf"><div class="wt"><span class="wt-t glow">[ ФАЙЛЫ ]</span><button class="wc" id="files-x"><svg width="12" height="12" viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11" stroke="#00ff41" stroke-width="1.5"/><line x1="11" y1="1" x2="1" y2="11" stroke="#00ff41" stroke-width="1.5"/></svg></button></div><div class="wb" style="position:relative;"><div style="font-size:11px;color:var(--gd);margin-bottom:12px;">&gt; АРХИВ ФАЙЛОВ:</div><hr class="sep"><div class="flc" id="files-list"></div><div class="fvo" id="files-vwr"><div class="fvh"><span class="fvn glow" id="fv-name"></span><button class="wc" id="fv-x"><svg width="12" height="12" viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11" stroke="#00ff41" stroke-width="1.5"/><line x1="11" y1="1" x2="1" y2="11" stroke="#00ff41" stroke-width="1.5"/></svg></button></div><div class="fvb" id="fv-body"></div></div></div></div></div>
+<div class="wo" id="w-files"><div class="wf"><div class="wt"><span class="wt-t glow">[ ФАЙЛЫ ]</span><button class="wc" id="files-x"><svg width="12" height="12" viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11" stroke="#00ff41" stroke-width="1.5"/><line x1="11" y1="1" x2="1" y2="11" stroke="#00ff41" stroke-width="1.5"/></svg></button></div><div class="wb" style="position:relative;"><div style="font-size:11px;color:var(--gd);margin-bottom:12px;">&gt; АРХИВ ВЛОЖЕНИЙ (ФОТО/ФАЙЛЫ):</div><hr class="sep"><div class="flc" id="files-list"></div><div class="fvo" id="files-vwr"><div class="fvh"><span class="fvn glow" id="fv-name"></span><button class="wc" id="fv-x"><svg width="12" height="12" viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11" stroke="#00ff41" stroke-width="1.5"/><line x1="11" y1="1" x2="1" y2="11" stroke="#00ff41" stroke-width="1.5"/></svg></button></div><div class="fvb" id="fv-body"></div></div></div></div></div>
 
-<div class="wo" id="w-ai"><div class="wf"><div class="wt"><span class="wt-t glow">[ AI: ПОМОЩНИК ]</span><button class="wc" id="ai-x"><svg width="12" height="12" viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11" stroke="#00ff41" stroke-width="1.5"/><line x1="11" y1="1" x2="1" y2="11" stroke="#00ff41" stroke-width="1.5"/></svg></button></div><div class="wb"><div class="aic"><div class="aiqb"><button class="aiq" data-q="привет">ПРИВЕТ</button><button class="aiq" data-q="как дела">КАК ДЕЛА</button><button class="aiq" data-q="сколько будет 2+2">2+2</button><button class="aiq" data-q="кто ты">КТО ТЫ</button><button class="aiq" data-q="помощь">ПОМОЩЬ</button><button class="aiq" data-q="дорого">ДОРОГО</button><button class="aiq" data-q="SPIN">SPIN</button><button class="aiq" data-q="планеты солнечной системы">ПЛАНЕТЫ</button><button class="aiq" data-q="теорема пифагора">ПИФАГОР</button></div><div class="aim" id="ai-msgs"><div class="ai-msg b"><div class="ms">AI.SECRET</div>ПРИВЕТ. Я — AI МОДУЛЬ v6.0.<br><br>УМЕЮ:<br>• Приветствия, разговор, время<br>• Калькулятор (2+2, один плюс один, корень из 144)<br>• Школьная программа<br>• Скрипт продаж<br><br>"помощь" — все команды.</div></div><div class="aiir"><input type="text" id="ai-in" placeholder="ЗАДАЙТЕ ВОПРОС..." autocomplete="off"><button type="button" id="ai-send">ЗАПРОС</button></div></div></div></div></div>
+<div class="wo" id="w-ai"><div class="wf"><div class="wt"><span class="wt-t glow">[ AI: ПОМОЩНИК ]</span><button class="wc" id="ai-x"><svg width="12" height="12" viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11" stroke="#00ff41" stroke-width="1.5"/><line x1="11" y1="1" x2="1" y2="11" stroke="#00ff41" stroke-width="1.5"/></svg></button></div><div class="wb"><div class="aic"><div class="aiqb"><button class="aiq" data-q="привет">ПРИВЕТ</button><button class="aiq" data-q="как дела">КАК ДЕЛА</button><button class="aiq" data-q="сколько будет 2+2">2+2</button><button class="aiq" data-q="кто ты">КТО ТЫ</button><button class="aiq" data-q="помощь">ПОМОЩЬ</button><button class="aiq" data-q="дорого">ДОРОГО</button><button class="aiq" data-q="SPIN">SPIN</button><button class="aiq" data-q="планеты солнечной системы">ПЛАНЕТЫ</button><button class="aiq" data-q="теорема пифагора">ПИФАГОР</button></div><div class="aim" id="ai-msgs"><div class="ai-msg b"><div class="ms">AI.SECRET</div>ПРИВЕТ. Я — AI МОДУЛЬ v8.0.<br><br>УМЕЮ:<br>• Приветствия, разговор, время, дата, день недели, как тебя зовут, что делаешь, да/нет/ок, пока, спасибо, помощь.<br>• Калькулятор (2+2, один плюс один, корень из 144, степени).<br>• Школьная программа (математика, физика, химия, история, география, литература, русский язык, биология).<br>• Скрипт продаж (структура звонка, дорого, SPIN, закрытие, жалоба, CRM, презентация, возражения, чек-лист, голос).<br><br>"помощь" — все команды.</div></div><div class="aiir"><input type="text" id="ai-in" placeholder="ЗАДАЙТЕ ВОПРОС..." autocomplete="off"><button type="button" id="ai-send">ЗАПРОС</button></div></div></div></div></div>
 
 <div class="wo" id="w-secret"><div class="wf"><div class="wt"><span class="wt-t glow">[ SECRET: СИСТЕМА ]</span><button class="wc" id="sec-x"><svg width="12" height="12" viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11" stroke="#00ff41" stroke-width="1.5"/><line x1="11" y1="1" x2="1" y2="11" stroke="#00ff41" stroke-width="1.5"/></svg></button></div><div class="wb"><div style="font-size:11px;color:var(--gd);margin-bottom:12px;">&gt; СИСТЕМНАЯ ИНФОРМАЦИЯ:</div><hr class="sep"><div class="sec" id="sec-body"></div></div></div></div>
 
@@ -284,7 +372,7 @@ button:active{transform:scale(.96);}button:disabled{opacity:.4;cursor:not-allowe
 'use strict';
 
 /* ================================================================ */
-/* SUPABASE КОНФИГУРАЦИЯ — ТВОИ КЛЮЧИ ПОДСТАВЛЕНЫ                   */
+/* SUPABASE КОНФИГУРАЦИЯ                                            */
 /* ================================================================ */
 var SUPABASE_URL = 'https://veyeweqwmersxpdwdxmv.supabase.co';
 var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZleWV3ZXF3bWVyc3hwZHdkeG12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4MzE0NzUsImV4cCI6MjEwNTQwNzQ3NX0.ylNi6iLUqSyNgugHwicSvtCmp1lGpD16HFJpC01i7nI';
@@ -304,16 +392,46 @@ function initSupabase(){
 }
 
 /* ================================================================ */
-/* ЛОКАЛЬНОЕ ХРАНИЛИЩЕ (резерв)                                     */
+/* ЛОКАЛЬНОЕ ХРАНИЛИЩЕ                                              */
 /* ================================================================ */
 var memStore = {};
 function lSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){memStore[k]=v;}}
 function lGet(k){try{var r=localStorage.getItem(k);return r?JSON.parse(r):null;}catch(e){return memStore[k]||null;}}
 function lClear(){try{localStorage.clear();}catch(e){}memStore={};}
 
-var tabUser = null;
-function setUser(u){tabUser=u;try{if(u)sessionStorage.setItem('ss_user',JSON.stringify(u));else sessionStorage.removeItem('ss_user');}catch(e){}}
-function getUser(){try{var r=sessionStorage.getItem('ss_user');if(r)return JSON.parse(r);}catch(e){}return tabUser;}
+function setUser(u){
+    try{
+        if(u) localStorage.setItem('secret_session', JSON.stringify(u));
+        else localStorage.removeItem('secret_session');
+    }catch(e){}
+}
+function getUser(){
+    try{
+        var r = localStorage.getItem('secret_session');
+        if(r) return JSON.parse(r);
+    }catch(e){}
+    return null;
+}
+
+/* ================================================================ */
+/* ХЕШИРОВАНИЕ ПАРОЛЕЙ                                              */
+/* ================================================================ */
+async function hashPassword(password){
+    try{
+        if(window.crypto && window.crypto.subtle){
+            var data = new TextEncoder().encode(password);
+            var hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            var hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+        }
+    }catch(e){}
+    var hash = 0;
+    for(var i=0;i<password.length;i++){
+        hash = ((hash << 5) - hash) + password.charCodeAt(i);
+        hash |= 0;
+    }
+    return 'fallback_' + Math.abs(hash).toString(36);
+}
 
 /* ================================================================ */
 /* КОНСТАНТЫ                                                        */
@@ -322,6 +440,9 @@ var BOTS=[{phone:'+79991234567',name:'БОТ_01'},{phone:'+79997654321',name:'Б
 var BOT_CODES=BOTS.map(function(b){return hashPhone(b.phone);});
 var REPLIES=['ПРИНЯЛ. ОБРАБАТЫВАЮ.','ПОДТВЕРЖДАЮ.','ДАННЫЕ ПРИНЯТЫ.','КАНАЛ СТАБИЛЕН.','РАСШИФРОВАНО.','ПЕРЕДАЮ ДАЛЕЕ.','СОХРАНЕНО.','СОГЛАСОВАНО.','ПОЛУЧЕНО. ОК.','ФИКСИРУЮ.'];
 var FNAMES={codes:'КОДЫ',contacts:'КОНТАКТЫ',files:'ФАЙЛЫ',ai:'AI',secret:'SECRET'};
+
+/* Лимит файла: 2 МБ */
+var MAX_FILE_SIZE = 2 * 1024 * 1024;
 
 /* ================================================================ */
 /* УТИЛИТЫ                                                          */
@@ -338,22 +459,148 @@ function openW(id){var e=$(id);if(e)e.classList.add('on');}
 function closeW(id){var e=$(id);if(e)e.classList.remove('on');}
 
 /* ================================================================ */
+/* РЕГИСТРАЦИЯ И ВХОД                                               */
+/* ================================================================ */
+function switchTab(isReg){
+    $('tab-reg').classList.toggle('active', isReg);
+    $('tab-login').classList.toggle('active', !isReg);
+    $('form-reg').classList.toggle('on', isReg);
+    $('form-login').classList.toggle('on', !isReg);
+}
+
+function valPass(p){
+    if(!p||p.length===0)return'ПАРОЛЬ НЕ ВВЕДЁН';
+    for(var i=0;i<p.length;i++){var c=p.charAt(i);if(c<'0'||c>'9')return'ТОЛЬКО ЦИФРЫ [0-9]';}
+    if(p.length<5)return'МИНИМУМ 5 ЦИФР';
+    var all=true,f=p.charAt(0);for(var j=1;j<p.length;j++){if(p.charAt(j)!==f){all=false;break;}}
+    if(all)return'ПОВТОР ОДНОЙ ЦИФРЫ';
+    var fb=['12345','54321','123456','654321','01234','43210'];
+    for(var k=0;k<fb.length;k++){if(p===fb[k])return'ПОСЛЕДОВАТЕЛЬНОСТЬ ЗАПРЕЩЕНА';}
+    return null;
+}
+function valPhone(p){var d=p.replace(/\D/g,'');if(d.length<5)return'МИН. 5 ЦИФР';if(d.length>15)return'МАКС. 15 ЦИФР';return null;}
+function valFpPass(p){if(!p||p.length===0)return'НЕ ВВЕДЁН';if(p.length<4)return'МИН. 4 СИМВОЛА';if(!/^[a-zA-Z0-9]+$/.test(p))return'ТОЛЬКО ЛАТИНСКИЕ БУКВЫ И ЦИФРЫ';return null;}
+
+async function doRegister(){
+    var ph=$('reg-phone'),pa=$('reg-pass'),pa2=$('reg-pass2');
+    var err=$('reg-err'),ok=$('reg-ok'),warn=$('reg-warn');
+    if(!ph||!pa||!pa2)return;
+    var phone=ph.value.trim(),pass=pa.value.trim(),pass2=pa2.value.trim();
+    if(err)err.style.display='none';if(ok)ok.style.display='none';if(warn)warn.style.display='none';
+
+    var pe=valPhone(phone);
+    if(pe){if(err){err.textContent='> [!] ТЕЛЕФОН: '+pe;err.style.display='block';}return;}
+
+    var pae=valPass(pass);
+    if(pae){if(err){err.textContent='> [!] ПАРОЛЬ: '+pae;err.style.display='block';}return;}
+
+    if(pass!==pass2){
+        if(err){err.textContent='> [!] ПАРОЛИ НЕ СОВПАДАЮТ';err.style.display='block';}
+        return;
+    }
+
+    var code=hashPhone(phone);
+    var passHash=await hashPassword(pass);
+
+    if(sbReady){
+        try{
+            var existing=await sb.from('secret_users').select('code').eq('phone',phone).maybeSingle();
+            if(existing&&existing.data){
+                if(err){err.textContent='> [!] АККАУНТ УЖЕ СУЩЕСТВУЕТ. ПЕРЕЙДИТЕ НА ВКЛАДКУ "ВХОД".';err.style.display='block';}
+                return;
+            }
+        }catch(e){}
+    }
+
+    if(sbReady){
+        try{
+            await sb.from('secret_users').upsert({
+                code:code,
+                phone:phone,
+                password_hash:passHash
+            },{onConflict:'code'});
+        }catch(e){console.error('[SB] Ошибка регистрации:', e);}
+    }
+
+    var uData={phone:phone,code:code,created:fdt()};
+    setUser(uData);
+
+    seedBots(code);
+
+    if(ok){ok.innerHTML='&gt; АККАУНТ СОЗДАН!<br>&gt; ВАШ КОД: <b>'+code+'</b><br>&gt; ЗАГРУЗКА...';ok.style.display='block';}
+    var btn=$('reg-btn');if(btn){btn.disabled=true;btn.textContent='[ ОБРАБОТКА... ]';}
+    setTimeout(function(){enterDesktop();},1200);
+}
+
+async function doLogin(){
+    var idIn=$('login-id'),paIn=$('login-pass');
+    var err=$('login-err'),ok=$('login-ok');
+    if(!idIn||!paIn)return;
+    var idInput=idIn.value.trim(),pass=paIn.value.trim();
+    if(err)err.style.display='none';if(ok)ok.style.display='none';
+
+    if(!idInput){if(err){err.textContent='> [!] ВВЕДИТЕ ТЕЛЕФОН ИЛИ КОД';err.style.display='block';}return;}
+    if(!pass){if(err){err.textContent='> [!] ВВЕДИТЕ ПАРОЛЬ';err.style.display='block';}return;}
+
+    var passHash=await hashPassword(pass);
+
+    if(!sbReady){
+        if(err){err.textContent='> [!] НЕТ СОЕДИНЕНИЯ С SUPABASE';err.style.display='block';}
+        return;
+    }
+
+    try{
+        var res=null;
+        if(idInput.indexOf('+')!==-1||idInput.replace(/\D/g,'').length>=10){
+            res=await sb.from('secret_users').select('*').eq('phone',idInput).maybeSingle();
+        }else{
+            res=await sb.from('secret_users').select('*').eq('code',idInput.toUpperCase()).maybeSingle();
+        }
+
+        if(res&&res.data){
+            var user=res.data;
+            if(user.password_hash===passHash){
+                var uData={phone:user.phone,code:user.code,created:user.created_at};
+                setUser(uData);
+                if(ok){ok.innerHTML='&gt; ДОБРО ПОЖАЛОВАТЬ!<br>&gt; КОД: <b>'+user.code+'</b>';ok.style.display='block';}
+                seedBots(user.code);
+                setTimeout(function(){enterDesktop();},1000);
+                return;
+            }else{
+                if(err){err.textContent='> [!] НЕВЕРНЫЙ ПАРОЛЬ';err.style.display='block';}
+                return;
+            }
+        }else{
+            if(err){err.textContent='> [!] АККАУНТ НЕ НАЙДЕН. ЗАРЕГИСТРИРУЙТЕСЬ.';err.style.display='block';}
+        }
+    }catch(e){
+        console.error('[SB] Ошибка входа:', e);
+        if(err){err.textContent='> [!] ОШИБКА СОЕДИНЕНИЯ';err.style.display='block';}
+    }
+}
+
+function seedBots(myCode){
+    var msgs=['СИСТЕМА АКТИВНА. КАНАЛ ЗАШИФРОВАН.','ПРИЁМ. КАНАЛ УСТАНОВЛЕН.','СОЕДИНЕНИЕ ПОДТВЕРЖДЕНО.','ТЕРМИНАЛ АКТИВЕН.'];
+    for(var i=0;i<BOTS.length;i++){
+        var bc=BOT_CODES[i],key=ck(myCode,bc);
+        var local=lGet('local_msgs_'+key)||[];
+        if(local.length===0){
+            local.push({id:Date.now()+i,filename:'MSG_001.txt',type:'text',content:'['+BOTS[i].name+'] '+msgs[i%msgs.length],date:fdt(),fromCode:bc,toCode:myCode});
+            lSet('local_msgs_'+key,local);
+        }
+    }
+}
+
+/* ================================================================ */
 /* SUPABASE: СЕТЬ                                                   */
 /* ================================================================ */
 var netUsers = {};
 var chatSub = null;
 
-async function sbRegisterUser(code, phone){
-    if(!sbReady)return;
-    try{
-        await sb.from('secret_users').upsert({code:code, phone:phone}, {onConflict:'code'});
-    }catch(e){console.error('[SB] Ошибка регистрации:', e);}
-}
-
 async function sbLoadNetworkUsers(){
     if(!sbReady)return[];
     try{
-        var res = await sb.from('secret_users').select('*');
+        var res=await sb.from('secret_users').select('*');
         if(res.data){
             var me=getUser();
             var list=[];
@@ -364,28 +611,28 @@ async function sbLoadNetworkUsers(){
             }
             return list;
         }
-    }catch(e){console.error('[SB] Ошибка загрузки пользователей:', e);}
+    }catch(e){}
     return[];
 }
 
-async function sbSendMsg(fromCode, toCode, msg){
+async function sbSendMsg(fromCode,toCode,msg){
     if(!sbReady)return false;
     try{
-        var key = ck(fromCode, toCode);
+        var key=ck(fromCode,toCode);
         await sb.from('secret_messages').insert({
-            convo_key: key,
-            filename: msg.filename,
-            type: msg.type,
-            content: msg.content,
-            date_text: msg.date,
-            from_code: fromCode,
-            to_code: toCode
+            convo_key:key,
+            filename:msg.filename,
+            type:msg.type,
+            content:msg.content,
+            date_text:msg.date,
+            from_code:fromCode,
+            to_code:toCode
         });
         return true;
-    }catch(e){console.error('[SB] Ошибка отправки:', e);return false;}
+    }catch(e){return false;}
 }
 
-async function sbLoadMessages(myCode, partnerCode){
+async function sbLoadMessages(myCode,partnerCode){
     if(!sbReady)return[];
     try{
         var key=ck(myCode,partnerCode);
@@ -395,7 +642,7 @@ async function sbLoadMessages(myCode, partnerCode){
                 return{id:m.id,filename:m.filename,type:m.type,content:m.content,date:m.date_text,fromCode:m.from_code,toCode:m.to_code};
             });
         }
-    }catch(e){console.error('[SB] Ошибка загрузки сообщений:', e);}
+    }catch(e){}
     return[];
 }
 
@@ -410,26 +657,18 @@ function sbSubscribe(myCode){
                 handleIncomingMessage(m);
             }
         })
-        .subscribe(function(status){
-            console.log('[SB] Realtime статус:', status);
-        });
+        .subscribe();
 }
 
 function handleIncomingMessage(m){
     var me=getUser();if(!me)return;
     var msgObj={id:m.id,filename:m.filename,type:m.type,content:m.content,date:m.date_text,fromCode:m.from_code,toCode:m.to_code};
-
     var key=ck(me.code,m.from_code);
     var local=lGet('local_msgs_'+key)||[];
     var exists=false;
     for(var i=0;i<local.length;i++){if(local[i].id===msgObj.id){exists=true;break;}}
     if(!exists){local.push(msgObj);lSet('local_msgs_'+key,local);}
-
-    if(currentChat===m.from_code){
-        renderChat();
-    } else {
-        showToast('НОВОЕ СООБЩЕНИЕ','ОТ АГЕНТА: '+m.from_code+(m.type!=='text'?' [ФАЙЛ]':''));
-    }
+    if(currentChat===m.from_code){renderChat();}else{showToast('НОВОЕ СООБЩЕНИЕ','ОТ АГЕНТА: '+m.from_code+(m.type!=='text'?' [ФАЙЛ]':''));}
     refreshNetList();
 }
 
@@ -457,58 +696,10 @@ function showToast(title,text){
 }
 
 /* ================================================================ */
-/* ВАЛИДАЦИЯ                                                        */
-/* ================================================================ */
-function valPass(p){
-    if(!p||p.length===0)return'ПАРОЛЬ НЕ ВВЕДЁН';
-    for(var i=0;i<p.length;i++){var c=p.charAt(i);if(c<'0'||c>'9')return'ТОЛЬКО ЦИФРЫ [0-9]';}
-    if(p.length<5)return'МИНИМУМ 5 ЦИФР';
-    var all=true,f=p.charAt(0);for(var j=1;j<p.length;j++){if(p.charAt(j)!==f){all=false;break;}}
-    if(all)return'ПОВТОР ОДНОЙ ЦИФРЫ';
-    var fb=['12345','54321','123456','654321','01234','43210'];
-    for(var k=0;k<fb.length;k++){if(p===fb[k])return'ПОСЛЕДОВАТЕЛЬНОСТЬ ЗАПРЕЩЕНА';}
-    return null;
-}
-function valFpPass(p){if(!p||p.length===0)return'НЕ ВВЕДЁН';if(p.length<4)return'МИН. 4 СИМВОЛА';if(!/^[a-zA-Z0-9]+$/.test(p))return'ТОЛЬКО ЛАТИНСКИЕ БУКВЫ И ЦИФРЫ';return null;}
-function valPhone(p){var d=p.replace(/\D/g,'');if(d.length<5)return'МИН. 5 ЦИФР';if(d.length>15)return'МАКС. 15 ЦИФР';return null;}
-
-/* ================================================================ */
-/* РЕГИСТРАЦИЯ                                                      */
-/* ================================================================ */
-async function doRegister(){
-    var ph=$('r-phone'),pa=$('r-pass'),err=$('r-err'),ok=$('r-ok'),warn=$('r-warn');
-    if(!ph||!pa)return;
-    var phone=ph.value.trim(),pass=pa.value.trim();
-    if(err)err.style.display='none';if(ok)ok.style.display='none';if(warn)warn.style.display='none';
-    var pe=valPhone(phone);if(pe){if(err){err.textContent='> [!] '+pe;err.style.display='block';}return;}
-    var pae=valPass(pass);if(pae){if(err){err.textContent='> [!] '+pae;err.style.display='block';}return;}
-    var code=hashPhone(phone);
-    var uData={phone:phone,password:pass,code:code,created:fdt()};
-    setUser(uData);
-    await sbRegisterUser(code,phone);
-    seedBots(code);
-    if(ok){ok.innerHTML='&gt; РЕГИСТРАЦИЯ ЗАВЕРШЕНА.<br>&gt; ВАШ КОД: <b>'+code+'</b><br>&gt; ПОДКЛЮЧЕНИЕ К SUPABASE...';ok.style.display='block';}
-    var btn=$('r-btn');if(btn){btn.disabled=true;btn.textContent='[ ОБРАБОТКА... ]';}
-    setTimeout(function(){enterDesktop();},1200);
-}
-
-function seedBots(myCode){
-    var msgs=['СИСТЕМА АКТИВНА. КАНАЛ ЗАШИФРОВАН.','ПРИЁМ. КАНАЛ УСТАНОВЛЕН.','СОЕДИНЕНИЕ ПОДТВЕРЖДЕНО.','ТЕРМИНАЛ АКТИВЕН.'];
-    for(var i=0;i<BOTS.length;i++){
-        var bc=BOT_CODES[i],key=ck(myCode,bc);
-        var local=lGet('local_msgs_'+key)||[];
-        if(local.length===0){
-            local.push({id:Date.now()+i,filename:'MSG_001.txt',type:'text',content:'['+BOTS[i].name+'] '+msgs[i%msgs.length],date:fdt(),fromCode:bc,toCode:myCode});
-            lSet('local_msgs_'+key,local);
-        }
-    }
-}
-
-/* ================================================================ */
 /* РАБОЧИЙ СТОЛ                                                     */
 /* ================================================================ */
 async function enterDesktop(){
-    var u=getUser();if(!u){showScr('scr-reg');return;}
+    var u=getUser();if(!u){showScr('scr-auth');return;}
     showScr('scr-desk');
     var ce=$('tb-code');if(ce)ce.textContent='АГЕНТ: '+u.code;
     startClock();loadPositions();updateLocks();loadWallpaper();
@@ -624,19 +815,12 @@ function renderBotList(containerId,withPhone){var le=$(containerId);if(!le)retur
 /* КОНТАКТЫ И ЧАТ                                                   */
 /* ================================================================ */
 var currentChat=null;
-
-async function openContacts(){
-    resetChat();
-    renderBotList('con-bots',false);
-    await refreshNetList();
-    openW('w-contacts');
-}
-
+async function openContacts(){resetChat();renderBotList('con-bots',false);await refreshNetList();openW('w-contacts');}
 async function refreshNetList(){
     var le=$('net-users');if(!le)return;
     var users=await sbLoadNetworkUsers();
     if(users.length===0){
-        le.innerHTML='<div style="font-size:10px;color:var(--gdd);line-height:1.7;">ПОКА НИКОГО. ЕСЛИ ДРУГ ЗАРЕГИСТРИРОВАЛСЯ — ОН ПОЯВИТСЯ ЗДЕСЬ.<br>ИЛИ ВВЕДИТЕ ЕГО КОД ВРУЧНУЮ ВЫШЕ.</div>';
+        le.innerHTML='<div style="font-size:10px;color:var(--gdd);line-height:1.7;">ПОКА НИКОГО. ЕСЛИ ДРУГ ЗАРЕГИСТРИРОВАЛСЯ — ОН ПОЯВИТСЯ ЗДЕСЬ.</div>';
         return;
     }
     le.innerHTML='';
@@ -654,9 +838,7 @@ async function refreshNetList(){
     }
     updateNetStatus();
 }
-
 function isOnline(code){return netUsers[code]&&(Date.now()-netUsers[code]<30000);}
-
 function resetChat(){
     currentChat=null;
     var sv=$('con-search'),cc=$('chat-c'),wt=$('con-title'),eb=$('con-err'),ci=$('con-code');
@@ -664,7 +846,6 @@ function resetChat(){
     if(wt)wt.textContent='[ КОНТАКТЫ ]';if(eb)eb.style.display='none';if(ci)ci.value='';
     closeCV();
 }
-
 function enterChat(){
     var ci=$('con-code'),eb=$('con-err');if(!ci)return;
     var code=ci.value.trim().toUpperCase();
@@ -678,7 +859,6 @@ function enterChat(){
     if(wt)wt.textContent='[ ЧАТ: '+code+' ]';if(pc)pc.textContent=code;
     renderChat();refreshChatStatus();
 }
-
 function refreshChatStatus(){
     var el=$('chat-st');if(!el||!currentChat)return;
     if(isOnline(currentChat)){el.textContent='[ОНЛАЙН]';el.className='chst son';}
@@ -686,29 +866,33 @@ function refreshChatStatus(){
     else{el.textContent='[ОФЛАЙН]';el.className='chst';}
 }
 
+/* РЕНДЕР ЧАТА: текст = пузырь, файл = карточка */
 async function renderChat(){
     var area=$('chat-msgs');var me=getUser();
     if(!area||!currentChat||!me)return;
     var messages=[];
-    if(sbReady){
-        messages=await sbLoadMessages(me.code,currentChat);
-    } else {
-        var key=ck(me.code,currentChat);
-        messages=lGet('local_msgs_'+key)||[];
-    }
+    if(sbReady){messages=await sbLoadMessages(me.code,currentChat);}
+    else{var key=ck(me.code,currentChat);messages=lGet('local_msgs_'+key)||[];}
     area.innerHTML='';
-    if(messages.length===0){area.innerHTML='<div class="chme">&gt; КАНАЛ ПУСТ. ОТПРАВЬТЕ ПЕРВОЕ СООБЩЕНИЕ.</div>';return;}
+    if(messages.length===0){area.innerHTML='<div class="chme">&gt; НЕТ СООБЩЕНИЙ</div>';return;}
     for(var i=0;i<messages.length;i++){
-        var msg=messages[i],isSent=msg.fromCode===me.code;
-        var el=document.createElement('div');
-        el.className='chmf '+(isSent?'ms':'mr');
-        el.setAttribute('data-idx',String(i));
-        el.innerHTML='<div class="msg-icon">'+fIcon(msg.type)+'</div><div class="msg-info"><div class="mn">'+esc(msg.filename)+'</div><div class="md">'+esc(msg.date)+'</div><div class="mdir">'+(isSent?'→ ОТПРАВЛЕНО':'← ПОЛУЧЕНО')+'</div></div>';
-        area.appendChild(el);
-    }
-    var els=area.querySelectorAll('.chmf');
-    for(var j=0;j<els.length;j++){
-        els[j].addEventListener('click',function(){openCV(parseInt(this.getAttribute('data-idx'),10));});
+        (function(idx,msg){
+            var isSent=msg.fromCode===me.code;
+            if(msg.type==='text'){
+                /* Текстовое сообщение — обычный пузырь */
+                var el=document.createElement('div');
+                el.className='chmf '+(isSent?'ms':'mr');
+                el.innerHTML='<div class="msg-text">'+esc(msg.content)+'</div><div class="msg-meta">'+esc(msg.date)+'</div>';
+                area.appendChild(el);
+            } else {
+                /* Файл/фото — кликабельная карточка */
+                var el2=document.createElement('div');
+                el2.className='chmf chmf-file '+(isSent?'ms':'mr');
+                el2.innerHTML='<div class="msg-icon">'+fIcon(msg.type)+'</div><div class="msg-info"><div class="mn">'+esc(msg.filename)+'</div><div class="md">'+esc(msg.date)+'</div><div class="mdir">'+(isSent?'→ ОТПРАВЛЕНО':'← ПОЛУЧЕНО')+'</div></div>';
+                el2.addEventListener('click',function(){openCV(idx,messages);});
+                area.appendChild(el2);
+            }
+        })(i, messages[i]);
     }
     area.scrollTop=area.scrollHeight;
 }
@@ -722,23 +906,13 @@ async function sendMsg(){
     var num=local.length+1;
     var fn='MSG_'+pad(num,3)+'.txt';
     var msg={id:Date.now(),filename:fn,type:'text',content:text,date:fdt(),fromCode:me.code,toCode:currentChat};
-
-    if(sbReady){
-        var sent=await sbSendMsg(me.code,currentChat,msg);
-        if(!sent){showToast('ОШИБКА','Не удалось отправить через сеть');}
-    }
-
+    if(sbReady){var sent=await sbSendMsg(me.code,currentChat,msg);if(!sent){showToast('ОШИБКА','Не удалось отправить через сеть');}}
     local.push(msg);
     lSet('local_msgs_'+key,local);
-
     mi.value='';
     renderChat();
-
-    if(BOT_CODES.indexOf(currentChat)!==-1){
-        scheduleBotReply(currentChat,num+1);
-    }
+    if(BOT_CODES.indexOf(currentChat)!==-1){scheduleBotReply(currentChat,num+1);}
 }
-
 function scheduleBotReply(partner,nextNum){
     setTimeout(async function(){
         var me=getUser();if(!me)return;
@@ -753,13 +927,12 @@ function scheduleBotReply(partner,nextNum){
         if(currentChat===partner)renderChat();
     },1500+Math.random()*2500);
 }
-
 async function attachFile(event){
     var fi=$('chat-file');var me=getUser();
     if(!fi||!currentChat||!me)return;
     var file=event.target.files&&event.target.files.length>0?event.target.files[0]:null;
     if(!file)return;
-    if(file.size>500000){alert('МАКС. 500КБ');fi.value='';return;}
+    if(file.size>MAX_FILE_SIZE){alert('ФАЙЛ СЛИШКОМ БОЛЬШОЙ. МАКСИМУМ 2 МБ.');fi.value='';return;}
     var key=ck(me.code,currentChat);
     var local=lGet('local_msgs_'+key)||[];
     var num=local.length+1;
@@ -776,26 +949,23 @@ async function attachFile(event){
     };
     reader.readAsDataURL(file);
 }
-
-function openCV(idx){
+function openCV(idx,messages){
     var me=getUser();if(!currentChat||!me)return;
-    var key=ck(me.code,currentChat);
-    var msgs=lGet('local_msgs_'+key)||[];
-    if(idx<0||idx>=msgs.length)return;
-    var msg=msgs[idx];
+    if(!messages||idx<0||idx>=messages.length)return;
+    var msg=messages[idx];
+    if(msg.type==='text')return; /* текст не открываем */
     var vn=$('cv-name'),vb=$('cv-body'),vwr=$('chat-vwr');
     if(!vn||!vb||!vwr)return;
     vn.textContent='[ '+msg.filename+' ]';vb.innerHTML='';
     if(msg.type==='image')vb.innerHTML='<img src="'+msg.content+'" alt="">';
     else if(msg.type==='file'){try{var parts=msg.content.split(',');vb.textContent=parts.length>1?atob(parts[1]):msg.content;}catch(e){vb.textContent='[ДАННЫЕ]';}}
-    else tw(vb,msg.content);
     vwr.classList.add('on');
 }
 function closeCV(){var v=$('chat-vwr');if(v)v.classList.remove('on');}
 function tw(el,text,cb){el.textContent='';var i=0;(function t(){if(i<text.length){el.textContent+=text.charAt(i);i++;setTimeout(t,12);}else{if(cb)cb();}})();}
 
 /* ================================================================ */
-/* ФАЙЛЫ                                                            */
+/* ФАЙЛЫ (только вложения)                                          */
 /* ================================================================ */
 function getMyFiles(){
     var me=getUser();if(!me)return[];
@@ -803,7 +973,15 @@ function getMyFiles(){
     for(var key in localStorage){
         if(key.indexOf('local_msgs_')===0){
             var msgs=lGet(key);
-            if(msgs){for(var i=0;i<msgs.length;i++){if(msgs[i].fromCode===me.code||msgs[i].toCode===me.code)all.push(msgs[i]);}}
+            if(msgs){
+                for(var i=0;i<msgs.length;i++){
+                    var m=msgs[i];
+                    /* Только вложения (не текст) */
+                    if(m.type!=='text'&&(m.fromCode===me.code||m.toCode===me.code)){
+                        all.push(m);
+                    }
+                }
+            }
         }
     }
     return all;
@@ -813,7 +991,7 @@ function renderFL(){
     var c=$('files-list');if(!c)return;
     var files=getMyFiles();var me=getUser();
     c.innerHTML='';
-    if(files.length===0){c.innerHTML='<div class="fem">&gt; АРХИВ ПУСТ.</div>';return;}
+    if(files.length===0){c.innerHTML='<div class="fem">&gt; НЕТ ВЛОЖЕНИЙ</div>';return;}
     var rev=files.slice().reverse();
     for(var i=0;i<rev.length;i++){
         var f=rev[i],row=document.createElement('div');row.className='flr';row.setAttribute('data-id',String(f.id));
@@ -835,16 +1013,14 @@ function openFV(fid){
     vn.textContent='[ '+file.filename+' ]';vb.innerHTML='';
     if(file.type==='image')vb.innerHTML='<img src="'+file.content+'" alt="">';
     else if(file.type==='file'){try{var p=file.content.split(',');vb.textContent=p.length>1?atob(p[1]):file.content;}catch(e){vb.textContent='[ДАННЫЕ]';}}
-    else tw(vb,file.content);
     vwr.classList.add('on');
 }
 function closeFV(){var v=$('files-vwr');if(v)v.classList.remove('on');}
 
 /* ================================================================ */
-/* AI                                                                 */
+/* AI                                                               */
 /* ================================================================ */
 var WORD_NUMS={'ноль':0,'один':1,'одна':1,'два':2,'две':2,'три':3,'четыре':4,'пять':5,'шесть':6,'семь':7,'восемь':8,'девять':9,'десять':10,'одиннадцать':11,'двенадцать':12,'тринадцать':13,'четырнадцать':14,'пятнадцать':15,'шестнадцать':16,'семнадцать':17,'восемнадцать':18,'девятнадцать':19,'двадцать':20,'тридцать':30,'сорок':40,'пятьдесят':50,'шестьдесят':60,'семьдесят':70,'восемьдесят':80,'девяносто':90,'сто':100,'двести':200,'триста':300,'четыреста':400,'пятьсот':500,'тысяча':1000,'миллион':1000000};
-
 function parseMath(q){
     var c=q.toLowerCase().replace(/сколько будет|посчитай|реши|вычисли|чему равно/g,'').replace(/\?/g,'').trim();
     for(var w in WORD_NUMS){var re=new RegExp('\\b'+w+'\\b','g');c=c.replace(re,' '+WORD_NUMS[w]+' ');}
@@ -857,13 +1033,13 @@ function parseMath(q){
     if(sm){var n=parseFloat(sm[1]);if(n<0)return'КОРЕНЬ ИЗ ОТРИЦАТЕЛЬНОГО НЕ ОПРЕДЕЛЁН.';return'√'+n+' = '+(Math.round(Math.sqrt(n)*10000)/10000)+'\n\n[КОРЕНЬ]';}
     return null;
 }
-
 function basicResp(q){
     var l=q.toLowerCase().trim();
     if(/^(привет|здравствуй|хай|добрый день|доброе утро|салют|здарова|ку)/.test(l))return['ПРИВЕТ, ОПЕРАТОР. ЧЕМ ПОМОЧЬ?','ЗДРАВСТВУЙТЕ. ТЕРМИНАЛ АКТИВЕН.','ПРИВЕТ. ГОТОВ К РАБОТЕ.','ДОБРЫЙ ДЕНЬ.'][Math.floor(Math.random()*4)];
     if(/как дела|как ты|как жизнь|как настроение/.test(l))return['ВСЕ СИСТЕМЫ В НОРМЕ. А У ВАС?','СТАТУС: АКТИВЕН. НАСТРОЕНИЕ: РАБОЧЕЕ.','ФУНКЦИОНИРУЮ СТАБИЛЬНО. СПРОСИТЕ ЧТО-НИБУДЬ!'][Math.floor(Math.random()*3)];
-    if(/кто ты|что ты|расскажи о себе|ты бот/.test(l))return'Я — AI МОДУЛЬ SECRET v6.0.\n\nУМЕЮ:\n• Разговор и приветствия\n• Калькулятор (2+2, один плюс один, корень из 144)\n• Школьная программа\n• Скрипт продаж\n\n"помощь" — все команды.';
-    if(/помощь|help|что умеешь|команды/.test(l))return'КОМАНДЫ:\n[БАЗА] привет / как дела / кто ты / спасибо / пока / сколько время\n[МАТЕМАТИКА] 2+2 / 10*5 / один плюс один / корень из 144 / 2 в степени 10\n[ШКОЛА] планеты / пифагор / ньютон / вода / фотосинтез / химия / дроби / проценты / площади / вов / россия / писатели / части речи\n[ПРОДАЖИ] структура звонка / дорого / SPIN / закрытие сделки / жалоба / CRM / презентация / чек-лист';
+    if(/кто ты|что ты|расскажи о себе|ты бот/.test(l))return'Я — AI МОДУЛЬ SECRET v8.0.\n\nУМЕЮ:\n• Разговор и приветствия.\n• Калькулятор.\n• Школьная программа.\n• Скрипт продаж.\n• Время, дата, день недели.\n• Имя: AI.SECRET.\n\n"помощь" — все команды.';
+    if(/как тебя зовут|твоё имя|твое имя|имя/.test(l))return'МОЁ ИМЯ: AI.SECRET.\nПОЛНОЕ НАЗВАНИЕ: МОДУЛЬ ИСКУССТВЕННОГО ИНТЕЛЛЕКТА СИСТЕМЫ SECRET.\nВЕРСИЯ: 8.0.';
+    if(/помощь|help|что умеешь|команды/.test(l))return'КОМАНДЫ:\n[БАЗА] привет / как дела / кто ты / спасибо / пока / сколько время / какое сегодня число / что делаешь / как тебя зовут / сколько время / какая дата / какой сегодня день / да / нет / ок';
     if(/спасибо|благодарю|пасиб/.test(l))return['ВСЕГДА ПОЖАЛОВАТЬ.','РАД ПОМОЧЬ.','НЕ ЗА ЧТО.','ПОЖАЛУЙСТА.'][Math.floor(Math.random()*4)];
     if(/пока|до свидания|прощай|удачи/.test(l))return['ДО ВСТРЕЧИ, ОПЕРАТОР.','ПОКА. БУДУ ЖДАТЬ.','ДО СВИДАНИЯ.'][Math.floor(Math.random()*3)];
     if(/сколько время|который час/.test(l)){var n=new Date();return'ВРЕМЯ: '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');}
@@ -872,7 +1048,6 @@ function basicResp(q){
     if(/что делаешь|чем занимаешься/.test(l))return'ОЖИДАНИЕ ЗАПРОСОВ: АКТИВНО.\nСЕТЬ: '+(sbReady?'SUPABASE ✓':'ЛОКАЛЬНО');
     return null;
 }
-
 var SCHOOL=[
 {k:['планет','солнечн','космос','меркурий','венер','марс','юпитер','сатурн'],r:'СОЛНЕЧНАЯ СИСТЕМА: 8 планет. Меркурий, Венера, Земля, Марс, Юпитер (самая большая), Сатурн (кольца), Уран, Нептун. Плутон — карликовая. Солнце — звезда, 99.86% массы.'},
 {k:['вода','н2о','водород','кислород'],r:'ВОДА (H₂O): 2H + O. Кипение: 100°C. Замерзание: 0°C. Плотность: 1000 кг/м³. 71% поверхности Земли.'},
@@ -895,9 +1070,7 @@ var SCHOOL=[
 {k:['клетк','днк','биолог'],r:'Клетка — единица жизни. ДНК хранит информацию. 5 царств: Животные, Растения, Грибы, Бактерии, Вирусы.'},
 {k:['географ','континент','океан','материк'],r:'6 материков, 4 океана. Эверест: 8848м. Марианская впадина: ~11022м.'}
 ];
-
 function schoolResp(q){var l=q.toLowerCase(),best=null,bs=0;for(var i=0;i<SCHOOL.length;i++){var e=SCHOOL[i],s=0;for(var j=0;j<e.k.length;j++){if(l.indexOf(e.k[j])!==-1)s+=e.k[j].length;}if(s>bs){bs=s;best=e;}}return(best&&bs>0)?best.r:null;}
-
 var SALES=[
 {k:['структура','звонк','этап'],r:'СТРУКТУРА ЗВОНКА:\n1. Приветствие. 2. Потребности. 3. Презентация. 4. Возражения. 5. Закрытие. 6. Завершение.\n70% говорит клиент, 30% — вы.'},
 {k:['дорого','цена','стоимост','бюджет'],r:'"ДОРОГО": Л-Выслушать. П-Присоединиться ("Понимаю"). Р-Развернуть ("По сравнению с чем? Цена=качество+гарантия").'},
@@ -911,9 +1084,7 @@ var SALES=[
 {k:['чек-лист','чеклист'],r:'ЧЕК-ЛИСТ: ☐Подготовился ☐Улыбнулся ☐Имя+компания ☐Удобно ли? ☐3+ вопроса ☐Боль ☐Выгоды ☐Возражения ☐След.шаг ☐CRM'},
 {k:['голос','темп','пауз'],r:'ГОЛОС: 120-150 слов/мин. Паузы=инструмент. Улыбка меняет тембр. Вдох животом=низкий голос=авторитет.'}
 ];
-
 function salesResp(q){var l=q.toLowerCase(),best=null,bs=0;for(var i=0;i<SALES.length;i++){var e=SALES[i],s=0;for(var j=0;j<e.k.length;j++){if(l.indexOf(e.k[j])!==-1)s+=e.k[j].length;}if(s>bs){bs=s;best=e;}}return(best&&bs>0)?best.r:null;}
-
 function aiResp(q){
     var r=basicResp(q);if(r)return r;
     r=parseMath(q);if(r)return r;
@@ -921,13 +1092,12 @@ function aiResp(q){
     r=salesResp(q);if(r)return r;
     return'ЗАПРОС НЕ РАСПОЗНАН.\n"помощь" — список команд.\nПримеры: привет / 2+2 / планеты / дорого / SPIN';
 }
-
 function sendAI(){
     var inp=$('ai-in');if(!inp)return;var text=inp.value.trim();if(!text)return;inp.value='';
     var ml=$('ai-msgs');if(!ml)return;
     var um=document.createElement('div');um.className='ai-msg u';um.innerHTML='<div class="ms">ОПЕРАТОР</div>'+esc(text);
     ml.appendChild(um);ml.scrollTop=ml.scrollHeight;
-    var tm=document.createElement('div');tm.className='ai-msg b';tm.id='ai-typing';tm.innerHTML='<div class="ms">AI.SECRET</div><span class="ai-typing" style="animation:aiDots 1.5s infinite">ОБРАБОТКА</span>';
+    var tm=document.createElement('div');tm.className='ai-msg b';tm.id='ai-typing';tm.innerHTML='<div class="ms">AI.SECRET</div><span style="animation:aiDots 1.5s infinite">ОБРАБОТКА</span>';
     ml.appendChild(tm);ml.scrollTop=ml.scrollHeight;
     setTimeout(function(){
         var t=$('ai-typing');if(t)t.remove();
@@ -947,10 +1117,9 @@ function renderSec(){
     var myFiles=getMyFiles().length;
     var onlineCnt=0;for(var k in netUsers){if(isOnline(k))onlineCnt++;}
     c.innerHTML=''
-    +'<div class="sei" onclick="alert(\'SECRET v6.0\\nURL: '+SUPABASE_URL+'\\nСТАТУС: '+(sbReady?'ПОДКЛЮЧЕНО':'ОШИБКА ПОДКЛЮЧЕНИЯ')+'\')"><div class="st">&gt; О СИСТЕМЕ</div><div class="sd">ВЕРСИЯ, ПРОТОКОЛ, СТАТУС</div></div>'
-    +'<div class="sei"><div class="st">&gt; СТАТИСТИКА</div><div class="sd">КОД: '+(me?me.code:'N/A')+' | ФАЙЛОВ: '+myFiles+' | SUPABASE: '+(sbReady?'ДА':'НЕТ')+'</div></div>'
+    +'<div class="sei" onclick="alert(\'SECRET v8.0\\nURL: '+SUPABASE_URL+'\\nСТАТУС: '+(sbReady?'ПОДКЛЮЧЕНО':'ОШИБКА')+'\')"><div class="st">&gt; О СИСТЕМЕ</div><div class="sd">ВЕРСИЯ, ПРОТОКОЛ, СТАТУС</div></div>'
+    +'<div class="sei"><div class="st">&gt; СТАТИСТИКА</div><div class="sd">КОД: '+(me?me.code:'N/A')+' | ВЛОЖЕНИЙ: '+myFiles+' | SUPABASE: '+(sbReady?'ДА':'НЕТ')+'</div></div>'
     +'<div class="sei"><div class="st">&gt; СЕТЬ</div><div class="sd">АГЕНТОВ В БАЗЕ: '+Object.keys(netUsers).length+' | ОНЛАЙН: '+onlineCnt+'</div></div>'
-    +'<div class="sei" onclick="alert(\'МУЛЬТИПЛЕЕР:\\n\\n1. Выложи index.html на GitHub Pages\\n2. Отправь ссылку другу\\n3. Оба регистрируетесь\\n4. Друг видит тебя в списке АГЕНТЫ В СЕТИ\\n5. Кликаете на код друг друга\\n6. Переписываетесь в реальном времени!\')"><div class="st">&gt; ИНСТРУКЦИЯ: МУЛЬТИПЛЕЕР</div><div class="sd">КАК ПЕРЕПИСЫВАТЬСЯ С ДРУГОМ</div></div>'
     +'<div class="sei" onclick="if(confirm(\'СБРОСИТЬ ВСЁ?\')){lClear();location.reload();}"><div class="st" style="color:#ff3333;">&gt; СБРОС</div><div class="sd">УДАЛЕНИЕ ЛОКАЛЬНЫХ ДАННЫХ</div></div>';
 }
 
@@ -958,10 +1127,24 @@ function renderSec(){
 /* ВЫХОД                                                            */
 /* ================================================================ */
 function logout(){
-    closeAll();setUser(null);
-    var rb=$('r-btn');if(rb){rb.disabled=false;rb.textContent='[ ЗАРЕГИСТРИРОВАТЬСЯ ]';}
-    var rp=$('r-phone'),ra=$('r-pass');if(rp)rp.value='';if(ra)ra.value='';
-    showScr('scr-reg');
+    if(confirm('ВЫЙТИ ИЗ АККАУНТА?')){
+        closeAll();
+        setUser(null);
+        var rp=$('reg-phone'),ra=$('reg-pass'),ra2=$('reg-pass2');
+        var li=$('login-id'),lp=$('login-pass');
+        if(rp)rp.value='';if(ra)ra.value='';if(ra2)ra2.value='';
+        if(li)li.value='';if(lp)lp.value='';
+        var regErr=$('reg-err'),regOk=$('reg-ok');
+        if(regErr)regErr.style.display='none';
+        if(regOk)regOk.style.display='none';
+        var logErr=$('login-err'),logOk=$('login-ok');
+        if(logErr)logErr.style.display='none';
+        if(logOk)logOk.style.display='none';
+        var regBtn=$('reg-btn');
+        if(regBtn){regBtn.disabled=false;regBtn.textContent='[ СОЗДАТЬ АККАУНТ ]';}
+        switchTab(true);
+        showScr('scr-auth');
+    }
 }
 function resetAll(){if(confirm('УДАЛИТЬ ВСЕ ЛОКАЛЬНЫЕ ДАННЫЕ?')){lClear();location.reload();}}
 function closeAll(){
@@ -969,15 +1152,33 @@ function closeAll(){
     var vs=document.querySelectorAll('.fvo');for(var j=0;j<vs.length;j++)vs[j].classList.remove('on');
     closeCtx();closeWP();
 }
-function passLive(){var pi=$('r-pass'),se=$('p-stat');if(!pi||!se)return;var p=pi.value;if(p.length===0){se.textContent='';se.className='p-stat';return;}var e=valPass(p);if(e){se.textContent='[✗] '+e;se.className='p-stat bad';}else{se.textContent='[✓] ПРИНЯТ';se.className='p-stat ok';}}
+function passLive(){var pi=$('reg-pass'),se=$('reg-pass-stat');if(!pi||!se)return;var p=pi.value;if(p.length===0){se.textContent='';se.className='p-stat';return;}var e=valPass(p);if(e){se.textContent='[✗] '+e;se.className='p-stat bad';}else{se.textContent='[✓] ПРИНЯТ';se.className='p-stat ok';}}
 
 /* ================================================================ */
 /* ПРИВЯЗКА СОБЫТИЙ                                                 */
 /* ================================================================ */
 function bindEvents(){
-    var rb=$('r-btn');if(rb)rb.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();doRegister();});
-    var pi=$('r-pass');if(pi){pi.addEventListener('input',passLive);pi.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doRegister();}});}
-    var pp=$('r-phone');if(pp)pp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doRegister();}});
+    $('tab-reg').addEventListener('click',function(){switchTab(true);});
+    $('tab-login').addEventListener('click',function(){switchTab(false);});
+
+    var regBtn=$('reg-btn');
+    if(regBtn)regBtn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();doRegister();});
+    var rPhone=$('reg-phone');
+    if(rPhone)rPhone.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doRegister();}});
+    var rPass=$('reg-pass');
+    if(rPass){
+        rPass.addEventListener('input',passLive);
+        rPass.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doRegister();}});
+    }
+    var rPass2=$('reg-pass2');
+    if(rPass2)rPass2.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doRegister();}});
+
+    var loginBtn=$('login-btn');
+    if(loginBtn)loginBtn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();doLogin();});
+    var loginId=$('login-id');
+    if(loginId)loginId.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doLogin();}});
+    var loginPass=$('login-pass');
+    if(loginPass)loginPass.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doLogin();}});
 
     var fs=document.querySelectorAll('.fi');
     for(var i=0;i<fs.length;i++){(function(f){f.addEventListener('click',function(e){if(drag.moved)return;reqPwd(f.getAttribute('data-folder'));});})(fs[i]);}
@@ -985,7 +1186,6 @@ function bindEvents(){
     var pok=$('p-ok');if(pok)pok.addEventListener('click',function(e){e.preventDefault();submitPwd();});
     var pca=$('p-can');if(pca)pca.addEventListener('click',function(e){e.preventDefault();cancelPwd();});
     var pinp=$('p-input');if(pinp)pinp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();submitPwd();}});
-
     var fps=$('fp-save');if(fps)fps.addEventListener('click',function(e){e.preventDefault();saveFP();});
     var fpr=$('fp-rm');if(fpr)fpr.addEventListener('click',function(e){e.preventDefault();rmFP();});
     var fpc=$('fp-can');if(fpc)fpc.addEventListener('click',function(e){e.preventDefault();closeFPModal();});
@@ -996,27 +1196,22 @@ function bindEvents(){
     var ccx=$('codes-x');if(ccx)ccx.addEventListener('click',function(){closeW('w-codes');});
     var ccf=$('codes-find');if(ccf)ccf.addEventListener('click',function(e){e.preventDefault();findCode();});
     var ccp=$('codes-ph');if(ccp)ccp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();findCode();}});
-
     var cnx=$('con-x');if(cnx)cnx.addEventListener('click',function(){closeW('w-contacts');resetChat();});
     var cngo=$('con-go');if(cngo)cngo.addEventListener('click',function(e){e.preventDefault();enterChat();});
     var cnci=$('con-code');if(cnci)cnci.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();enterChat();}});
-
     var chb=$('chat-back');if(chb)chb.addEventListener('click',function(){resetChat();});
     var chs=$('chat-send');if(chs)chs.addEventListener('click',function(e){e.preventDefault();sendMsg();});
     var chi=$('chat-in');if(chi)chi.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();sendMsg();}});
     var cha=$('chat-att');var chf=$('chat-file');
     if(cha&&chf){cha.addEventListener('click',function(){chf.click();});chf.addEventListener('change',attachFile);}
     var cvx=$('cv-x');if(cvx)cvx.addEventListener('click',function(){closeCV();});
-
     var flx=$('files-x');if(flx)flx.addEventListener('click',function(){closeW('w-files');});
     var fvx=$('fv-x');if(fvx)fvx.addEventListener('click',function(){closeFV();});
-
     var aix=$('ai-x');if(aix)aix.addEventListener('click',function(){closeW('w-ai');});
     var ais=$('ai-send');if(ais)ais.addEventListener('click',function(e){e.preventDefault();sendAI();});
     var aii=$('ai-in');if(aii)aii.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();sendAI();}});
     var aqs=document.querySelectorAll('.aiq');
     for(var q=0;q<aqs.length;q++){aqs[q].addEventListener('click',function(){var ai=$('ai-in');if(ai){ai.value=this.getAttribute('data-q');sendAI();}});}
-
     var scx=$('sec-x');if(scx)scx.addEventListener('click',function(){closeW('w-secret');});
 }
 
@@ -1029,9 +1224,14 @@ function init(){
     initDrag();
     initCtx();
     buildWPMenu();
+
     var u=getUser();
-    if(u&&u.password&&u.code)enterDesktop();
-    else showScr('scr-reg');
+    if(u&&u.code){
+        console.log('[СЕССИЯ] Найден сохранённый аккаунт:', u.code);
+        enterDesktop();
+    }else{
+        showScr('scr-auth');
+    }
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
